@@ -3,9 +3,11 @@
 </script>
 
 <template>
-    <footer>
-        Its a footer
+    <footer class="flex shrink-0 bg-gray-500 p-6">
+        <p>Copyright © 2023</p>
     </footer>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+
+</style>
