@@ -1,0 +1,154 @@
+<?php
+
+
+namespace Tests\Feature\Models\Mappers;
+
+
+use App\Exceptions\MappingException;
+use App\Models\Item;
+use App\Models\ItemPrice;
+use App\Models\Mappers\ItemMapper;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+
+class ItemMapperTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_when_item_is_not_available_in_database(): void
+    {
+        $this->seed();
+
+        $inputData = $this->inputData();
+
+        /** @var ItemMapper $mapper */
+        $mapper = $this->app->make(ItemMapper::class);
+        $model = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertSame('544fb45d4bdc2dee738b4568', $model->external_id);
+        $this->assertSame('Salewa first aid kit', $model->name);
+        $this->assertSame('salewa-first-aid-kit', $model->name_normalized);
+        $this->assertSame('Salewa', $model->short_name);
+        $this->assertSame('A first aid kit containing a bivibag, various types of bandages, and dressing tools.', $model->description);
+        $this->assertSame('https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-base-image.webp', $model->icon_link);
+        $this->assertSame('https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-image.webp', $model->img_link);
+        $this->assertSame('Tarkov.dev', $model->source);
+
+        $itemPrices = $model->prices()->get();
+        $this->assertCount(2, $itemPrices);
+
+        $this->assertNotNull(Item::where('external_id', '544fb45d4bdc2dee738b4568')->get());
+        $this->assertCount(2, ItemPrice::has('item')->get());
+    }
+
+    public function test_when_item_is_in_database(): void
+    {
+        $this->seed();
+
+        $inputData = $this->inputData();
+
+        $item = new Item();
+        $item->fill([
+            'external_id' => $inputData['id'],
+            'name' => $inputData['name'],
+            'name_normalized' => $inputData['normalizedName'],
+            'short_name' => $inputData['shortName'],
+            'description' => $inputData['description'],
+            'icon_link' => $inputData['baseImageLink'],
+            'img_link' => $inputData['inspectImageLink'],
+            'source' => 'Tarkov.dev',
+        ]);
+        $item->save();
+
+        /** @var ItemMapper $mapper */
+        $mapper = $this->app->make(ItemMapper::class);
+        $model = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertSame($item->id, $model->id);
+
+        $this->assertCount(1, Item::all());
+        $this->assertCount(2, ItemPrice::has('item')->get());
+    }
+
+    public function test_when_item_is_in_database_and_has_prices(): void
+    {
+        $this->seed();
+
+        $inputData = $this->inputData();
+
+        $inputData['buyFor'][0]['price'] = 1234;
+        $inputData['buyFor'][0]['priceRUB'] = 1234;
+        /** @var ItemMapper $mapper */
+        $mapper = $this->app->make(ItemMapper::class);
+        $item = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertNotNull($item->prices()->where('price', '=', 1234)->get()->first());
+
+        $inputData['buyFor'][0]['price'] = 3333;
+        $inputData['buyFor'][0]['priceRUB'] = 3333;
+        $item = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertNull($item->prices()->where('price', '=', 1234)->get()->first());
+        $this->assertNotNull($item->prices()->where('price', '=', 3333)->get()->first());
+
+        $this->assertCount(2, ItemPrice::has('item')->get());
+    }
+
+    public function test_for_invalid_data_without_external_id(): void
+    {
+        $this->seed();
+
+        $inputData = $this->inputData();
+        unset($inputData['id']);
+
+        $this->expectException(MappingException::class);
+
+        /** @var ItemMapper $mapper */
+        $mapper = $this->app->make(ItemMapper::class);
+        $mapper->fromTarkovApiToModel($inputData);
+    }
+
+    private function inputData(): array
+    {
+        return json_decode('{
+                "id": "544fb45d4bdc2dee738b4568",
+                "name": "Salewa first aid kit",
+                "normalizedName": "salewa-first-aid-kit",
+                "shortName": "Salewa",
+                "description": "A first aid kit containing a bivibag, various types of bandages, and dressing tools.",
+                "baseImageLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-base-image.webp",
+                "inspectImageLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-image.webp",
+                "buyFor": [
+                    {
+                        "vendor": {
+                            "name": "Therapist",
+                            "normalizedName": "therapist"
+                        },
+                        "price": 37061,
+                        "priceRUB": 37061,
+                        "currency": "RUB",
+                        "currencyItem": {
+                            "id": "5449016a4bdc2d6f028b456f",
+                            "name": "Roubles",
+                            "normalizedName": "roubles"
+                        }
+                    },
+                    {
+                        "vendor": {
+                            "name": "Flea Market",
+                            "normalizedName": "flea-market"
+                        },
+                        "price": 23731,
+                        "priceRUB": 23731,
+                        "currency": "RUB",
+                        "currencyItem": {
+                            "id": "5449016a4bdc2d6f028b456f",
+                            "name": "Roubles",
+                            "normalizedName": "roubles"
+                        }
+                    }
+                ]
+            }', true);
+    }
+}
