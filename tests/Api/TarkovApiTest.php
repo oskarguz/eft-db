@@ -41,7 +41,7 @@ class TarkovApiTest extends TestCase
 
         $requiredKeys = [
             'id', 'name', 'normalizedName', 'shortName', 'description',
-            'baseImageLink', 'inspectImageLink', 'buyFor'
+            'baseImageLink', 'inspectImageLink', 'sellFor'
         ];
 
         $item = $result[0];

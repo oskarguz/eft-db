@@ -77,16 +77,16 @@ class ItemMapperTest extends TestCase
 
         $inputData = $this->inputData();
 
-        $inputData['buyFor'][0]['price'] = 1234;
-        $inputData['buyFor'][0]['priceRUB'] = 1234;
+        $inputData['sellFor'][0]['price'] = 1234;
+        $inputData['sellFor'][0]['priceRUB'] = 1234;
         /** @var ItemMapper $mapper */
         $mapper = $this->app->make(ItemMapper::class);
         $item = $mapper->fromTarkovApiToModel($inputData);
 
         $this->assertNotNull($item->prices()->where('price', '=', 1234)->get()->first());
 
-        $inputData['buyFor'][0]['price'] = 3333;
-        $inputData['buyFor'][0]['priceRUB'] = 3333;
+        $inputData['sellFor'][0]['price'] = 3333;
+        $inputData['sellFor'][0]['priceRUB'] = 3333;
         $item = $mapper->fromTarkovApiToModel($inputData);
 
         $this->assertNull($item->prices()->where('price', '=', 1234)->get()->first());
@@ -119,7 +119,7 @@ class ItemMapperTest extends TestCase
                 "description": "A first aid kit containing a bivibag, various types of bandages, and dressing tools.",
                 "baseImageLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-base-image.webp",
                 "inspectImageLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-image.webp",
-                "buyFor": [
+                "sellFor": [
                     {
                         "vendor": {
                             "name": "Therapist",

@@ -40,13 +40,13 @@ class ItemMapper implements MapperInterface
         ]);
         $model->save();
 
-        $buyFor = $rawData['buyFor'] ?? [];
-        if (!is_array($buyFor)) {
-            $buyFor = [];
+        $sellFor = $rawData['sellFor'] ?? [];
+        if (!is_array($sellFor)) {
+            $sellFor = [];
         }
 
         $itemPrices = collect();
-        foreach ($buyFor as $item) {
+        foreach ($sellFor as $item) {
             $itemPrice = $this->itemPriceMapper->fromTarkovApiToModel($item);
             if (!$itemPrice) {
                 continue;

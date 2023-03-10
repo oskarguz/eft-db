@@ -91,7 +91,7 @@ class TarkovDevItemClient implements ItemClientInterface
                     description,
                     baseImageLink,
                     inspectImageLink,
-                    buyFor {
+                    sellFor {
                         vendor {
                             name,
                             normalizedName
