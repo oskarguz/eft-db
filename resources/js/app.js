@@ -1,5 +1,6 @@
 import './bootstrap';
-import '../css/app.css';
+import '../css/app.scss';
+import '@flaticon/flaticon-uicons/css/all/all.css';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';

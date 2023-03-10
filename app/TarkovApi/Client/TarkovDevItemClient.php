@@ -91,6 +91,9 @@ class TarkovDevItemClient implements ItemClientInterface
                     description,
                     baseImageLink,
                     inspectImageLink,
+                    width,
+                    height,
+                    types,
                     sellFor {
                         vendor {
                             name,

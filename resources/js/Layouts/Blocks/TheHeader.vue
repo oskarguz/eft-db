@@ -1,13 +1,13 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
+
 </script>
 
 <template>
-    <header class="flex shrink-0 bg-gray-500 p-6">
-        <h2 class="text-xl">EFT.DB</h2>
-        <nav class="flex-1 pl-24 pr-2">
-            <Link href="/" class="align-middle">Dashboard</Link>
-        </nav>
+    <header class="flex justify-between shrink-0 bg-primary text-fontPrimary p-6">
+        <div>
+            <i class="fi fi-br-menu-burger text-2xl"></i>
+        </div>
+        <h1 class="text-xl font-bold">EFT-DB</h1>
     </header>
 </template>
 

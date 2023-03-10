@@ -34,6 +34,9 @@ class ItemMapperTest extends TestCase
         $this->assertSame('https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-base-image.webp', $model->icon_link);
         $this->assertSame('https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-image.webp', $model->img_link);
         $this->assertSame('Tarkov.dev', $model->source);
+        $this->assertSame(1, $model->width);
+        $this->assertSame(2, $model->height);
+        $this->assertTrue((bool) $model->can_be_sold_on_flea_market);
 
         $itemPrices = $model->prices()->get();
         $this->assertCount(2, $itemPrices);
@@ -109,6 +112,51 @@ class ItemMapperTest extends TestCase
         $mapper->fromTarkovApiToModel($inputData);
     }
 
+    public function test_cases_for_field_can_be_sold_on_flea_market(): void
+    {
+        $this->seed();
+
+        // case: 1, cannot be sold
+        $inputData = $this->inputData();
+        $inputData['types'] = ['noFlea'];
+
+        /** @var ItemMapper $mapper */
+        $mapper = $this->app->make(ItemMapper::class);
+        $model = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertFalse((bool) $model->can_be_sold_on_flea_market);
+
+        $model->delete();
+
+        // case: 2, cannot be sold
+        $inputData = $this->inputData();
+        $inputData['types'] = ['lorem', 'ipsum', 'noFlea'];
+
+        $model = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertFalse((bool) $model->can_be_sold_on_flea_market);
+
+        $model->delete();
+
+        // case: 3 can be sold on flea market
+        $inputData = $this->inputData();
+        $inputData['types'] = ['lorem', 'ipsum'];
+
+        $model = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertTrue((bool) $model->can_be_sold_on_flea_market);
+
+        $model->delete();
+
+        // case: 4 can be sold on flea market
+        $inputData = $this->inputData();
+        $inputData['types'] = null;
+
+        $model = $mapper->fromTarkovApiToModel($inputData);
+
+        $this->assertTrue((bool) $model->can_be_sold_on_flea_market);
+    }
+
     private function inputData(): array
     {
         return json_decode('{
@@ -119,6 +167,11 @@ class ItemMapperTest extends TestCase
                 "description": "A first aid kit containing a bivibag, various types of bandages, and dressing tools.",
                 "baseImageLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-base-image.webp",
                 "inspectImageLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-image.webp",
+                "width": 1,
+                "height": 2,
+                "types": [
+                    "lorem", "ipsum"
+                ],
                 "sellFor": [
                     {
                         "vendor": {

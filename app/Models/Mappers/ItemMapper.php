@@ -23,7 +23,9 @@ class ItemMapper implements MapperInterface
             throw new MappingException($rawData, 'Tarkov api', Item::class, 'External id not found');
         }
 
-        $model = Item::with('prices')->where('external_id', $externalId)->first();
+        $model = Item::with('prices.vendor', 'prices.currency')
+            ->where('external_id', $externalId)
+            ->first();
         if (empty($model)) {
             $model = new Item();
         }
@@ -37,6 +39,9 @@ class ItemMapper implements MapperInterface
             'img_link' => $rawData['inspectImageLink'],
             'icon_link' => $rawData['baseImageLink'] ?? '',
             'source' => 'Tarkov.dev',
+            'width' => (int) ($rawData['width'] ?? 1),
+            'height' => (int) ($rawData['height'] ?? 1),
+            'can_be_sold_on_flea_market' => !is_array($rawData['types'] ?? []) || !in_array('noFlea', $rawData['types'] ?? [], true)
         ]);
         $model->save();
 
@@ -55,9 +60,16 @@ class ItemMapper implements MapperInterface
             $itemPrice->item()->associate($model);
             $itemPrices->add($itemPrice);
         }
+        $currentItemPricesCount = $model->prices()->count();
         $model->prices()->delete();
         if ($itemPrices->isNotEmpty()) {
             $model->prices()->saveMany($itemPrices);
+        }
+
+        if ($currentItemPricesCount !== $itemPrices->count()) { // refresh whole model for new items
+            $model = Item::with('prices.vendor', 'prices.currency')
+                ->where('external_id', $externalId)
+                ->first();
         }
 
         return $model;

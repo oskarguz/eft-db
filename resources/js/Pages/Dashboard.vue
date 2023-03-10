@@ -8,7 +8,7 @@ import SearchItemWidget from "@/Components/SearchItemWidget.vue";
     <Head title="Dashboard"></Head>
 
     <MainLayout>
-        <section class="flex flex-col justify-center grow bg-gray-100 px-6">
+        <section class="flex flex-col justify-center grow px-4 bg-primary">
             <SearchItemWidget></SearchItemWidget>
         </section>
     </MainLayout>

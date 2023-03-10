@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('items_prices', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->timestamps();
-            $table->decimal('price');
-            $table->decimal('price_rub');
-            $table->foreignUuid('item_id')->constrained('items');
-            $table->foreignUuid('vendor_id')->constrained('vendors');
-            $table->foreignUuid('currency_id')->constrained('currencies');
+            $table->decimal('price', 40, 2);
+            $table->decimal('price_rub', 40, 2);
+            $table->foreignUuid('item_id')->constrained('items')->onDelete('cascade');
+            $table->foreignUuid('vendor_id')->constrained('vendors')->onDelete('cascade');
+            $table->foreignUuid('currency_id')->constrained('currencies')->onDelete('cascade');
         });
     }
 
