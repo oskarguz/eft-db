@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import BadgeDanger from "@/Components/Badge/BadgeDanger.vue";
 import BadgePurple from "@/Components/Badge/BadgePurple.vue";
+import { formatNumber } from "@/Utils/format";
 
 const props = defineProps({
     name: { required: true, type: String, },
@@ -43,24 +44,24 @@ const fleaMarketTradeOffer = computed(
                 <span>Flea Market:</span>
                 <BadgeDanger v-if="!canBeSoldOnFleaMarket" class="h-fit self-center">Can't be sold</BadgeDanger>
                 <BadgePurple v-else-if="!fleaMarketTradeOffer" class="h-fit self-center">Not found</BadgePurple>
-                <span v-else>{{ fleaMarketTradeOffer.avgPrice }}{{ fleaMarketTradeOffer.currencySymbol }}</span>
+                <span v-else>{{ formatNumber(fleaMarketTradeOffer.avgPrice) }}{{ fleaMarketTradeOffer.currencySymbol }}</span>
             </p>
             <p class="flex justify-between">
                 <span>Best trader{{ bestTraderOffer ? ` (${bestTraderOffer.traderName})` : '' }}:</span>
                 <BadgePurple v-if="!bestTraderOffer" class="h-fit self-center">Not found</BadgePurple>
-                <span v-else>{{ bestTraderOffer.avgPrice }}{{ bestTraderOffer.currencySymbol }}</span>
+                <span v-else>{{ formatNumber(bestTraderOffer.avgPrice) }}{{ bestTraderOffer.currencySymbol }}</span>
             </p>
             <h5 class="font-bold">Per Slot (avg 24h):</h5>
             <p class="flex justify-between">
                 <span>Flea Market:</span>
                 <BadgeDanger v-if="!canBeSoldOnFleaMarket" class="h-fit self-center">Can't be sold</BadgeDanger>
                 <BadgePurple v-else-if="!fleaMarketTradeOffer" class="h-fit self-center">Not found</BadgePurple>
-                <span v-else>{{ fleaMarketTradeOffer.avgPrice / slotsCount }}{{ fleaMarketTradeOffer.currencySymbol }}</span>
+                <span v-else>{{ formatNumber(fleaMarketTradeOffer.avgPrice / slotsCount) }}{{ fleaMarketTradeOffer.currencySymbol }}</span>
             </p>
             <p class="flex justify-between">
                 <span>Best trader{{ bestTraderOffer ? ` (${bestTraderOffer.traderName})` : '' }}:</span>
                 <BadgePurple v-if="!bestTraderOffer" class="h-fit self-center">Not found</BadgePurple>
-                <span v-else>{{ bestTraderOffer.avgPrice / slotsCount }}{{ bestTraderOffer.currencySymbol }}</span>
+                <span v-else>{{ formatNumber(bestTraderOffer.avgPrice / slotsCount) }}{{ bestTraderOffer.currencySymbol }}</span>
             </p>
         </section>
     </div>
