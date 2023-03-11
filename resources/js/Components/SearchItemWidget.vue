@@ -1,29 +1,39 @@
 <script setup>
 import { getByName } from "@/Api/ItemApi";
-import BaseTextInput from "@/Components/Buttons/BaseTextInput.vue";
+import BaseTextInput from "@/Components/Input/BaseTextInput.vue";
 import Item from "@/Components/Item.vue";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
+import DefaultButton from "@/Components/Button/DefaultButton.vue";
 
 const SEARCH_DELAY_IN_SECONDS = 2;
+
 const itemsList = ref([]);
+const state = reactive({
+    showLoadMoreButton: true,
+    disableInputs: false,
+});
+const pagination = reactive({
+    limit: 20,
+    offset: 0,
+});
 
 let ajaxRequest = null;
 let searchDelayId = null;
+let searchInputValue = '';
 
-const onInputKeyup = async (e) => {
-    let value = e.target.value;
-
+const onInputKeyup = (e) => {
+    searchInputValue = e.target.value;
     if (searchDelayId) {
         clearTimeout(searchDelayId);
     }
 
     let delay = SEARCH_DELAY_IN_SECONDS * 1000;
-    if (value === '') {
+    if (searchInputValue === '') {
         delay = 0;
     }
 
     searchDelayId = setTimeout(() => {
-        if (value.length < 3) {
+        if (searchInputValue.length < 3) {
             return;
         }
         if (ajaxRequest) {
@@ -31,19 +41,36 @@ const onInputKeyup = async (e) => {
         }
 
         ajaxRequest = axios.CancelToken.source();
+        pagination.offset = 0;
 
-        getByName(value, 20, 0, ajaxRequest.token)
+        getByName(searchInputValue, pagination.limit, pagination.offset, ajaxRequest.token)
             .then((response) => {
                 itemsList.value = response.data;
+
+                state.showLoadMoreButton = itemsList.value.length === pagination.limit
             })
             .catch((reason) => {
                 if (axios.isCancel(reason)) {
-                    console.log('cancelled');
                     return;
                 }
                 console.error(reason);
             });
     }, delay);
+}
+
+const loadMoreItems = () => {
+    state.disableInputs = true;
+
+    pagination.offset += pagination.limit;
+    getByName(searchInputValue, pagination.limit, pagination.offset, ajaxRequest.token)
+        .then((response) => {
+            itemsList.value = [...itemsList.value, ...response.data];
+            state.disableInputs = false;
+        })
+        .catch((reason) => {
+            console.error(reason);
+            state.disableInputs = false;
+        });
 }
 
 const getTradeOffersFromItem = (item) => {
@@ -64,11 +91,12 @@ const getTradeOffersFromItem = (item) => {
 <template>
     <div class="flex flex-wrap">
         <label class="text-center block w-full text-2xl mb-8 font-semibold text-fontPrimary">Sell price checker</label>
-        <BaseTextInput @keyup="onInputKeyup"
+        <BaseTextInput :disabled="state.disableInputs"
+                       @keyup="onInputKeyup"
                        placeholder="Item name..."
-                       class="w-3/4 mx-auto p-3 text-xl"
+                       class="w-3/4 mx-auto p-3 text-xl disabled:cursor-not-allowed"
         />
-        <div class="flex flex-wrap w-full border-0 rounded-lg bg-white mt-10 py-4"
+        <div class="flex flex-wrap w-full border-0 rounded-lg bg-white mt-10 pt-4"
              v-show="itemsList.length"
         >
             <Item
@@ -80,6 +108,12 @@ const getTradeOffersFromItem = (item) => {
                 :name="item.name || ''"
                 class="my-1 w-full">
             </Item>
+            <DefaultButton class="w-full mt-2 disabled:cursor-not-allowed"
+                @click="loadMoreItems"
+                v-show="state.showLoadMoreButton"
+                :disabled="state.disableInputs">
+                Show more
+            </DefaultButton>
         </div>
     </div>
 </template>
