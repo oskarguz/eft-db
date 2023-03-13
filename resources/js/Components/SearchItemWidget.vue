@@ -138,7 +138,7 @@ const clearSearchInput = () => {
 
 <template>
     <div class="flex flex-wrap">
-        <label class="text-center block w-full text-2xl mb-8 font-semibold text-fontPrimary">Sell price checker</label>
+        <label class="text-center block w-full text-2xl mb-8 font-semibold text-fontPrimary"><i class="fi fi-sr-usd-circle align-middle"></i> Sell price checker</label>
         <div class="relative w-3/4 mx-auto">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none" aria-hidden="true">
                 <i class="w-5 h-5 text-gray-400 fi-rr-search"></i>
@@ -160,7 +160,7 @@ const clearSearchInput = () => {
                 </button>
             </div>
         </div>
-        <div class="flex flex-wrap w-full border-0 rounded-lg bg-white mt-10 pt-4"
+        <div class="flex justify-center flex-wrap w-full border-0 rounded-lg mt-10 pt-4 md:gap-x-4 lg:mx-14"
              v-show="itemsList.length"
              :class="state.loading ? 'opacity-50' : ''"
         >
@@ -171,15 +171,15 @@ const clearSearchInput = () => {
                 :slots-count="(item.height ?? 1) * (item.width ?? 1)"
                 :img-link="item.img_link || ''"
                 :name="item.name || ''"
-                class="my-1 w-full">
+                class="bg-white my-1 w-full md:max-w-[400px] last-of-type:mb-4 md:last-of-type:mb-1">
             </Item>
-            <DefaultButton class="w-full mt-2 disabled:cursor-not-allowed text-center relative"
+            <DefaultButton class="w-full mt-2 disabled:cursor-not-allowed text-center flex justify-center items-center"
                 @click="loadMoreItems"
                 v-show="state.showLoadMoreButton"
                 :disabled="state.disableInputs">
                 Show more
                 <div v-show="state.loading"
-                     class="absolute inset-y-0 right-0 flex items-center pointer-events-none pr-3"
+                     class="ml-4 flex items-center pointer-events-none pr-3"
                      aria-hidden="true"
                 >
                     <DefaultSpinner class="w-8 h-8 text-purple-600 fill-white"></DefaultSpinner>

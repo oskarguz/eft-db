@@ -29,7 +29,7 @@ const fleaMarketTradeOffer = computed(
 </script>
 
 <template>
-    <div class="flex flex-wrap bg-lightGray p-3 border-4 rounded border-darkGray">
+    <div class="flex flex-wrap bg-lightGray p-3 rounded">
         <header class="w-full flex">
             <div class="img-container">
                 <img class="object-scale-down w-full h-full rounded-md" :src="imgLink" :alt="'imageOf:' + name">
