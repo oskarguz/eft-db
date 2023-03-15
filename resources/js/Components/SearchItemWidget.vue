@@ -7,7 +7,7 @@ import DefaultButton from "@/Components/Button/DefaultButton.vue";
 import DefaultSpinner from "@/Components/Spinner/DefaultSpinner.vue";
 import Alert from "@/Components/Alert/Alert.vue";
 
-const SEARCH_DELAY_IN_SECONDS = 2;
+const SEARCH_DELAY_IN_SECONDS = 1.5;
 
 const state = reactive({
     showLoadMoreButton: false,

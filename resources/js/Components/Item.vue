@@ -20,12 +20,10 @@ const bestTraderOffer = computed(() => {
     if (!tradeOffers.length) {
         return null;
     }
-    return tradeOffers.reduce((prev, curr) => curr.avgPrice > prev.avgPrice ? curr : prev);
+    return tradeOffers.reduce((prev, curr) => Number(curr.avgPrice) > Number(prev.avgPrice) ? curr : prev);
 });
 
-const fleaMarketTradeOffer = computed(
-    () => props.tradeOffers.filter((offer) => offer.traderName === 'FleaMarket').pop()
-);
+const fleaMarketTradeOffer = computed(() => props.tradeOffers.filter((offer) => offer.traderName === 'FleaMarket').pop());
 </script>
 
 <template>
