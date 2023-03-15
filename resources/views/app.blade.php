@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Set of best tools for Escape from Tarkov game. Here you can find all important information about the game">
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 

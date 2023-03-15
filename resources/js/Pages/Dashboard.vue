@@ -5,7 +5,7 @@ import SearchItemWidget from "@/Components/SearchItemWidget.vue";
 </script>
 
 <template>
-    <Head title="Dashboard"></Head>
+    <Head title="Sell price checker"></Head>
 
     <MainLayout>
         <section class="flex flex-col justify-center grow px-4 bg-primary">
