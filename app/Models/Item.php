@@ -12,6 +12,7 @@ class Item extends Model
     use HasFactory, HasUuids;
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $with = ['prices'];
 
     protected static function newFactory(): ItemFactory
     {

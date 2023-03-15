@@ -11,6 +11,7 @@ class ItemPrice extends Model
     use HasFactory, HasUuids;
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $table = 'items_prices';
+    protected $with = ['currency', 'vendor'];
 
     public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

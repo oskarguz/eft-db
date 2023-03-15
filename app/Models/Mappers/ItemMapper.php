@@ -23,9 +23,7 @@ class ItemMapper implements MapperInterface
             throw new MappingException($rawData, 'Tarkov api', Item::class, 'External id not found');
         }
 
-        $model = Item::with('prices.vendor', 'prices.currency')
-            ->where('external_id', $externalId)
-            ->first();
+        $model = Item::where('external_id', $externalId)->first();
         if (empty($model)) {
             $model = new Item();
         }
@@ -60,16 +58,11 @@ class ItemMapper implements MapperInterface
             $itemPrice->item()->associate($model);
             $itemPrices->add($itemPrice);
         }
-        $currentItemPricesCount = $model->prices()->count();
+
         $model->prices()->delete();
         if ($itemPrices->isNotEmpty()) {
             $model->prices()->saveMany($itemPrices);
-        }
-
-        if ($currentItemPricesCount !== $itemPrices->count()) { // refresh whole model for new items
-            $model = Item::with('prices.vendor', 'prices.currency')
-                ->where('external_id', $externalId)
-                ->first();
+            $model->refresh();
         }
 
         return $model;

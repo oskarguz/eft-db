@@ -63,9 +63,7 @@ class ItemService
             $perPage = $paginator->getLimit();
             $page = $paginator->getPage();
         }
-        $itemsPaginator = Item::with('prices.vendor', 'prices.currency')
-            ->where('name', 'LIKE', "%$name%")
-            ->simplePaginate(perPage: $perPage, page: $page);
+        $itemsPaginator = Item::where('name', 'LIKE', "%$name%")->simplePaginate(perPage: $perPage, page: $page);
 
         $models = collect();
         foreach ($itemsPaginator->items() as $item) {
