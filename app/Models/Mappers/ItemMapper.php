@@ -9,6 +9,9 @@ use App\Models\Item;
 
 class ItemMapper implements MapperInterface
 {
+    private array $models = [];
+    private bool $modelsLoaded = false;
+
     public function __construct(
         private ItemPriceMapper $itemPriceMapper
     ) {}
@@ -23,7 +26,10 @@ class ItemMapper implements MapperInterface
             throw new MappingException($rawData, 'Tarkov api', Item::class, 'External id not found');
         }
 
-        $model = Item::where('external_id', $externalId)->first();
+        $model = $this->getExistingModel($externalId);
+        if ($model && $model->updated_at->diffInMinutes(now()) <= 5) {
+            return $model;
+        }
         if (empty($model)) {
             $model = new Item();
         }
@@ -66,5 +72,28 @@ class ItemMapper implements MapperInterface
         }
 
         return $model;
+    }
+
+    public function loadAllModelsForMapping(): void
+    {
+        $models = Item::all();
+
+        foreach ($models as $model) {
+            $this->models[$model->external_id] = $model;
+        }
+
+        $this->modelsLoaded = true;
+    }
+
+    private function getExistingModel(string $externalId): ?Item
+    {
+        if (array_key_exists($externalId, $this->models)) {
+            return $this->models[$externalId];
+        }
+        if ($this->modelsLoaded) {
+            return null;
+        }
+
+        return Item::where('external_id', $externalId)->first();
     }
 }

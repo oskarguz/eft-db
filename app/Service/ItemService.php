@@ -13,6 +13,7 @@ use App\TarkovApi\Helpers\PaginatorInterface;
 use App\TarkovApi\TarkovApiInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ItemService
@@ -22,10 +23,9 @@ class ItemService
         private ItemMapper $mapper
     ) {}
 
-    // @TODO add Caching
     public function getByRequest(Request $request): Collection
     {
-        $name = trim((string) $request->query->get('name'));
+        $name = mb_strtolower(trim((string) $request->query->get('name')));
         $limit = $request->query->getInt('limit');
         $offset = $request->query->getInt('offset');
         $paginator = null;
@@ -76,9 +76,18 @@ class ItemService
     private function getByNameFromApi(string $name, ?PaginatorInterface $paginator = null): Collection
     {
         $this->tarkovApi->item()->setPaginator($paginator ?? null);
-        $apiData = $name
-            ? collect($this->tarkovApi->item()->findByName($name))
-            : collect($this->tarkovApi->item()->findAll());
+
+        $offset = (int) $paginator?->getOffset();
+        $limit = (int) $paginator?->getLimit();
+        $apiData = collect(Cache::remember("api_items:by-name:$name--o:$offset--l:$limit", now()->addMinutes(5), function () use ($name) {
+            return $name
+                ? $this->tarkovApi->item()->findByName($name)
+                : $this->tarkovApi->item()->findAll();
+        }));
+
+        if ($apiData->count() > 50) {
+            $this->mapper->loadAllModelsForMapping();
+        }
 
         $models = collect();
         foreach ($apiData as $item) {

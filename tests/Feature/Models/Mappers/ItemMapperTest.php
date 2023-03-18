@@ -64,6 +64,8 @@ class ItemMapperTest extends TestCase
         ]);
         $item->save();
 
+        $this->travel(6)->minutes();
+
         /** @var ItemMapper $mapper */
         $mapper = $this->app->make(ItemMapper::class);
         $model = $mapper->fromTarkovApiToModel($inputData);
@@ -87,6 +89,8 @@ class ItemMapperTest extends TestCase
         $item = $mapper->fromTarkovApiToModel($inputData);
 
         $this->assertNotNull($item->prices()->where('price', '=', 1234)->get()->first());
+
+        $this->travel(6)->minutes();
 
         $inputData['sellFor'][0]['price'] = 3333;
         $inputData['sellFor'][0]['priceRUB'] = 3333;
