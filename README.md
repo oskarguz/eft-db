@@ -10,7 +10,7 @@
 > 
 > Type only part of the name (ex. "fort", "m4a1") and you will get full information about the selling price as well as where it is most profitable
 
-#### Live version: https://reedy.bieda.it/
+#### Live version: https://eftdb.bieda.it/
 
 ### More soon!
 
