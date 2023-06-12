@@ -15,3 +15,11 @@
 ### More soon!
 
 I don't make a profit from this project, it was created for fun ;)
+
+
+### Tech stack
+- Php
+- Laravel
+- Vue.js
+- MySql
+- Docker
